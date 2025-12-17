@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react'
+import { motion, AnimatePresence } from 'motion/react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
@@ -15,6 +16,8 @@ import JsonDiff from '@/components/JsonDiff'
 import { ModeToggle } from '@/components/mode-toggle'
 import { GitHubCorner } from '@/components/github-corner'
 import { CodeEditor } from '@/components/code-editor'
+
+const MotionCard = motion.create(Card)
 
 interface FormatPreset {
   name: string
@@ -117,31 +120,49 @@ function App() {
   }, [])
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex min-h-screen flex-col">
       <GitHubCorner href="https://github.com/rvanbaalen/json-beautify" />
 
       <div className="flex-1 p-4 md:p-8">
         <div className="mx-auto flex h-full max-w-7xl flex-col">
-          <header className="mb-6 text-center">
+          <motion.header
+            className="mb-8 text-center"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          >
             <div className="mb-4 flex items-center justify-center gap-4">
-              <h1 className="text-3xl font-bold tracking-tight md:text-4xl">JSON Beautifier</h1>
+              <h1 className="font-serif text-4xl tracking-tight text-foreground md:text-5xl">
+                JSON <span className="italic text-primary">Beautifier</span>
+              </h1>
               <ModeToggle />
             </div>
             <p className="text-muted-foreground">
               Format, beautify, and compare your JSON data
             </p>
-          </header>
+          </motion.header>
 
           <Tabs defaultValue="beautify" className="flex flex-1 flex-col">
-            <TabsList className="mx-auto">
-              <TabsTrigger value="beautify">Beautify</TabsTrigger>
-              <TabsTrigger value="diff">Compare / Diff</TabsTrigger>
-            </TabsList>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <TabsList className="mx-auto">
+                <TabsTrigger value="beautify">Beautify</TabsTrigger>
+                <TabsTrigger value="diff">Compare / Diff</TabsTrigger>
+              </TabsList>
+            </motion.div>
 
             <TabsContent value="beautify" className="mt-6 flex flex-1 flex-col space-y-6">
-              <div className="flex flex-wrap items-center justify-center gap-4">
+              <motion.div
+                className="flex flex-wrap items-center justify-center gap-4"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+              >
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="preset" className="whitespace-nowrap">
+                  <Label htmlFor="preset" className="whitespace-nowrap font-medium">
                     Format Preset:
                   </Label>
                   <Select value={selectedPreset} onValueChange={setSelectedPreset}>
@@ -171,21 +192,37 @@ function App() {
                     Clear
                   </Button>
                 </div>
-              </div>
+              </motion.div>
 
-              {error && (
-                <div className="rounded-lg border border-destructive bg-destructive/10 p-4 text-destructive">
-                  {error}
-                </div>
-              )}
+              <AnimatePresence mode="wait">
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10, height: 0 }}
+                    animate={{ opacity: 1, y: 0, height: 'auto' }}
+                    exit={{ opacity: 0, y: -10, height: 0 }}
+                    transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                    className="overflow-hidden"
+                  >
+                    <div className="rounded-lg border border-destructive bg-destructive/10 p-4 text-destructive">
+                      {error}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               <div className="grid flex-1 gap-6 md:grid-cols-2">
-                <Card className="flex flex-col">
+                <MotionCard
+                  className="flex flex-col"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                  whileHover={{ y: -2 }}
+                >
                   <CardHeader className="pb-3">
                     <CardTitle className="flex items-center justify-between">
-                      <span>Input</span>
-                      <span className="text-sm font-normal text-muted-foreground">
-                        {input.length} characters
+                      <span className="font-serif text-lg italic">Input</span>
+                      <span className="font-mono text-xs font-normal text-muted-foreground">
+                        {input.length} chars
                       </span>
                     </CardTitle>
                   </CardHeader>
@@ -197,21 +234,36 @@ function App() {
                       minHeight="calc(100vh - 420px)"
                     />
                   </CardContent>
-                </Card>
+                </MotionCard>
 
-                <Card className="flex flex-col">
+                <MotionCard
+                  className="flex flex-col"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                  whileHover={{ y: -2 }}
+                >
                   <CardHeader className="pb-3">
                     <CardTitle className="flex items-center justify-between">
-                      <span>Output</span>
+                      <span className="font-serif text-lg italic">Output</span>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-normal text-muted-foreground">
-                          {output.length} characters
+                        <span className="font-mono text-xs font-normal text-muted-foreground">
+                          {output.length} chars
                         </span>
-                        {output && (
-                          <Button size="sm" variant="outline" onClick={copyToClipboard}>
-                            {copied ? 'Copied!' : 'Copy'}
-                          </Button>
-                        )}
+                        <AnimatePresence mode="wait">
+                          {output && (
+                            <motion.div
+                              initial={{ opacity: 0, scale: 0.9 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              exit={{ opacity: 0, scale: 0.9 }}
+                              transition={{ duration: 0.15 }}
+                            >
+                              <Button size="sm" variant="outline" onClick={copyToClipboard}>
+                                {copied ? 'Copied!' : 'Copy'}
+                              </Button>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
                     </CardTitle>
                   </CardHeader>
@@ -223,7 +275,7 @@ function App() {
                       minHeight="calc(100vh - 420px)"
                     />
                   </CardContent>
-                </Card>
+                </MotionCard>
               </div>
             </TabsContent>
 
@@ -232,7 +284,12 @@ function App() {
             </TabsContent>
           </Tabs>
 
-          <footer className="mt-6 text-center text-sm text-muted-foreground">
+          <motion.footer
+            className="mt-8 text-center text-sm text-muted-foreground"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
             <p>
               All processing happens in your browser. No data is sent to any server.
             </p>
@@ -242,12 +299,12 @@ function App() {
                 href="https://robinvanbaalen.nl"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline transition-colors hover:text-foreground"
+                className="underline underline-offset-2 transition-colors hover:text-foreground"
               >
                 Robin van Baalen
               </a>
             </p>
-          </footer>
+          </motion.footer>
         </div>
       </div>
     </div>
