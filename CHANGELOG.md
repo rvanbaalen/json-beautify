@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.1](https://github.com/rvanbaalen/json-beautify/compare/json-beautify-v1.5.0...json-beautify-v1.5.1) (2025-12-17)
+
+
+### Bug Fixes
+
+* remove margins from icons inside buttons ([#15](https://github.com/rvanbaalen/json-beautify/issues/15)) ([96b8d1d](https://github.com/rvanbaalen/json-beautify/commit/96b8d1d59d0ecd9165a32aaec6071cd157951749))
+
 ## [1.5.0](https://github.com/rvanbaalen/json-beautify/compare/json-beautify-v1.4.0...json-beautify-v1.5.0) (2025-12-17)
 
 
