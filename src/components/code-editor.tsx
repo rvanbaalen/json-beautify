@@ -1,8 +1,11 @@
 import CodeMirror from '@uiw/react-codemirror'
 import { json } from '@codemirror/lang-json'
+import { markdown } from '@codemirror/lang-markdown'
 import { githubLight, githubDark } from '@uiw/codemirror-theme-github'
 import { useTheme } from '@/components/theme-provider'
 import { useMemo, useEffect, useState } from 'react'
+
+export type EditorLanguage = 'json' | 'markdown'
 
 interface CodeEditorProps {
   value: string
@@ -11,6 +14,7 @@ interface CodeEditorProps {
   placeholder?: string
   className?: string
   minHeight?: string
+  language?: EditorLanguage
 }
 
 export function CodeEditor({
@@ -20,6 +24,7 @@ export function CodeEditor({
   placeholder,
   className = '',
   minHeight = '400px',
+  language = 'json',
 }: CodeEditorProps) {
   const { theme } = useTheme()
   const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>('light')
@@ -40,12 +45,16 @@ export function CodeEditor({
     return effectiveTheme === 'dark' ? githubDark : githubLight
   }, [theme, systemTheme])
 
+  const languageExtension = useMemo(() => {
+    return language === 'markdown' ? markdown() : json()
+  }, [language])
+
   return (
     <CodeMirror
       value={value}
       onChange={onChange}
       theme={editorTheme}
-      extensions={[json()]}
+      extensions={[languageExtension]}
       readOnly={readOnly}
       placeholder={placeholder}
       className={`rounded-md border overflow-hidden ${className}`}
