@@ -237,3 +237,31 @@
 .jsondiffpatch-child-node-type-array > .jsondiffpatch-property-name {
   color: var(--muted-foreground);
 }
+
+/* Mode badge styling */
+.mode-badge {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Smooth transitions for mode switching */
+.mode-transition {
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Compare button hover effect */
+.compare-trigger:hover {
+  background: linear-gradient(
+    135deg,
+    oklch(0.45 0.12 75 / 0.1) 0%,
+    oklch(0.55 0.10 75 / 0.05) 100%
+  );
+}
+
+.dark .compare-trigger:hover {
+  background: linear-gradient(
+    135deg,
+    oklch(0.78 0.12 75 / 0.15) 0%,
+    oklch(0.65 0.10 75 / 0.08) 100%
+  );
+}
