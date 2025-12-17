@@ -533,7 +533,7 @@ export function JsonWorkspace() {
           {isCompareMode && (
             <>
               <Button onClick={compareDiff}>
-                <GitCompare className="w-4 h-4 mr-2" />
+                <GitCompare className="w-4 h-4" />
                 Compare
               </Button>
               <Button onClick={swapInputs} variant="outline" size="icon" title="Swap inputs">
@@ -545,19 +545,19 @@ export function JsonWorkspace() {
             <Button onClick={copyToClipboard} variant={copied ? 'default' : 'outline'}>
               {copied ? (
                 <>
-                  <Check className="w-4 h-4 mr-2" />
+                  <Check className="w-4 h-4" />
                   Copied!
                 </>
               ) : (
                 <>
-                  <Copy className="w-4 h-4 mr-2" />
+                  <Copy className="w-4 h-4" />
                   Copy
                 </>
               )}
             </Button>
           )}
           <Button onClick={loadSample} variant="outline">
-            <FileJson className="w-4 h-4 mr-2" />
+            <FileJson className="w-4 h-4" />
             Sample
           </Button>
           <Button onClick={clearAll} variant="outline" size="icon" title="Clear all">
@@ -674,7 +674,7 @@ export function JsonWorkspace() {
                       onClick={enableCompareMode}
                       className="text-xs"
                     >
-                      <GitCompare className="w-3 h-3 mr-1.5" />
+                      <GitCompare className="w-3 h-3" />
                       Compare
                     </Button>
                   </div>
