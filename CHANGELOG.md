@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/rvanbaalen/json-beautify/compare/json-beautify-v1.2.0...json-beautify-v1.3.0) (2025-12-17)
+
+
+### Features
+
+* add UI enhancements with dark mode, line numbers, and GitHub corner ([#7](https://github.com/rvanbaalen/json-beautify/issues/7)) ([ba475dd](https://github.com/rvanbaalen/json-beautify/commit/ba475dd6c56cae3d5174f7a4cfd6822b9affb4fa))
+
 ## [1.2.0](https://github.com/rvanbaalen/json-beautify/compare/json-beautify-v1.1.0...json-beautify-v1.2.0) (2025-12-17)
 
 
