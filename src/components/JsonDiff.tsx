@@ -3,7 +3,6 @@ import { create, type Delta } from 'jsondiffpatch'
 import { format as formatHtml } from 'jsondiffpatch/formatters/html'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import {
   Select,
@@ -13,12 +12,14 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
+import { CodeEditor } from '@/components/code-editor'
 
 type DiffViewMode = 'unified' | 'split' | 'annotated'
 
 interface DiffLine {
   type: 'unchanged' | 'added' | 'removed' | 'modified-old' | 'modified-new'
   content: string
+  lineNumber?: number
 }
 
 const diffpatcher = create({
@@ -46,13 +47,13 @@ function computeLineDiff(leftLines: string[], rightLines: string[]): DiffLine[] 
     const rightLine = rightLines[rightIdx]
 
     if (leftIdx >= leftLines.length) {
-      result.push({ type: 'added', content: rightLine })
+      result.push({ type: 'added', content: rightLine, lineNumber: rightIdx + 1 })
       rightIdx++
     } else if (rightIdx >= rightLines.length) {
-      result.push({ type: 'removed', content: leftLine })
+      result.push({ type: 'removed', content: leftLine, lineNumber: leftIdx + 1 })
       leftIdx++
     } else if (leftLine === rightLine) {
-      result.push({ type: 'unchanged', content: leftLine })
+      result.push({ type: 'unchanged', content: leftLine, lineNumber: leftIdx + 1 })
       leftIdx++
       rightIdx++
     } else {
@@ -74,15 +75,15 @@ function computeLineDiff(leftLines: string[], rightLines: string[]): DiffLine[] 
       }
 
       if (!foundInRight && !foundInLeft) {
-        result.push({ type: 'modified-old', content: leftLine })
-        result.push({ type: 'modified-new', content: rightLine })
+        result.push({ type: 'modified-old', content: leftLine, lineNumber: leftIdx + 1 })
+        result.push({ type: 'modified-new', content: rightLine, lineNumber: rightIdx + 1 })
         leftIdx++
         rightIdx++
       } else if (foundInRight) {
-        result.push({ type: 'removed', content: leftLine })
+        result.push({ type: 'removed', content: leftLine, lineNumber: leftIdx + 1 })
         leftIdx++
       } else {
-        result.push({ type: 'added', content: rightLine })
+        result.push({ type: 'added', content: rightLine, lineNumber: rightIdx + 1 })
         rightIdx++
       }
     }
@@ -210,42 +211,48 @@ function JsonDiff() {
   }, [leftParsed, semanticDiff])
 
   const renderDiffLine = (line: DiffLine, index: number) => {
-    const baseClasses = 'px-4 py-0.5 font-mono text-sm whitespace-pre'
+    const baseClasses = 'px-4 py-0.5 font-mono text-sm whitespace-pre flex'
+    const lineNumClasses = 'w-12 text-right pr-4 select-none opacity-50 shrink-0'
 
     switch (line.type) {
       case 'added':
         return (
           <div key={index} className={`${baseClasses} bg-diff-added-bg text-diff-added-foreground`}>
-            <span className="inline-block w-8 text-diff-added opacity-70 select-none">+</span>
-            {line.content}
+            <span className={lineNumClasses}>{line.lineNumber}</span>
+            <span className="inline-block w-6 text-diff-added opacity-70 select-none shrink-0">+</span>
+            <span className="flex-1">{line.content}</span>
           </div>
         )
       case 'removed':
         return (
           <div key={index} className={`${baseClasses} bg-diff-removed-bg text-diff-removed-foreground`}>
-            <span className="inline-block w-8 text-diff-removed opacity-70 select-none">-</span>
-            {line.content}
+            <span className={lineNumClasses}>{line.lineNumber}</span>
+            <span className="inline-block w-6 text-diff-removed opacity-70 select-none shrink-0">-</span>
+            <span className="flex-1">{line.content}</span>
           </div>
         )
       case 'modified-old':
         return (
           <div key={index} className={`${baseClasses} bg-diff-removed-bg text-diff-removed-foreground`}>
-            <span className="inline-block w-8 text-diff-removed opacity-70 select-none">-</span>
-            {line.content}
+            <span className={lineNumClasses}>{line.lineNumber}</span>
+            <span className="inline-block w-6 text-diff-removed opacity-70 select-none shrink-0">-</span>
+            <span className="flex-1">{line.content}</span>
           </div>
         )
       case 'modified-new':
         return (
           <div key={index} className={`${baseClasses} bg-diff-added-bg text-diff-added-foreground`}>
-            <span className="inline-block w-8 text-diff-added opacity-70 select-none">+</span>
-            {line.content}
+            <span className={lineNumClasses}>{line.lineNumber}</span>
+            <span className="inline-block w-6 text-diff-added opacity-70 select-none shrink-0">+</span>
+            <span className="flex-1">{line.content}</span>
           </div>
         )
       default:
         return (
           <div key={index} className={`${baseClasses} text-muted-foreground`}>
-            <span className="inline-block w-8 opacity-50 select-none"> </span>
-            {line.content}
+            <span className={lineNumClasses}>{line.lineNumber}</span>
+            <span className="inline-block w-6 opacity-50 select-none shrink-0"> </span>
+            <span className="flex-1">{line.content}</span>
           </div>
         )
     }
@@ -273,11 +280,12 @@ function JsonDiff() {
                 return (
                   <div
                     key={idx}
-                    className={`px-4 py-0.5 font-mono text-sm whitespace-pre ${
+                    className={`px-4 py-0.5 font-mono text-sm whitespace-pre flex ${
                       isRemoved ? 'bg-diff-removed-bg text-diff-removed-foreground' : ''
                     }`}
                   >
-                    {line}
+                    <span className="w-12 text-right pr-4 select-none opacity-50 shrink-0">{idx + 1}</span>
+                    <span className="flex-1">{line}</span>
                   </div>
                 )
               })}
@@ -298,11 +306,12 @@ function JsonDiff() {
                 return (
                   <div
                     key={idx}
-                    className={`px-4 py-0.5 font-mono text-sm whitespace-pre ${
+                    className={`px-4 py-0.5 font-mono text-sm whitespace-pre flex ${
                       isAdded ? 'bg-diff-added-bg text-diff-added-foreground' : ''
                     }`}
                   >
-                    {line}
+                    <span className="w-12 text-right pr-4 select-none opacity-50 shrink-0">{idx + 1}</span>
+                    <span className="flex-1">{line}</span>
                   </div>
                 )
               })}
@@ -358,7 +367,7 @@ function JsonDiff() {
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
-          <CardHeader>
+          <CardHeader className="pb-3">
             <CardTitle className="flex items-center justify-between">
               <span>Original JSON</span>
               <span className="text-sm font-normal text-muted-foreground">
@@ -367,17 +376,17 @@ function JsonDiff() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Textarea
-              placeholder="Paste original JSON here..."
-              className="min-h-[300px] font-mono text-sm"
+            <CodeEditor
               value={leftInput}
-              onChange={(e) => setLeftInput(e.target.value)}
+              onChange={setLeftInput}
+              placeholder="Paste original JSON here..."
+              minHeight="300px"
             />
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
+          <CardHeader className="pb-3">
             <CardTitle className="flex items-center justify-between">
               <span>Modified JSON</span>
               <span className="text-sm font-normal text-muted-foreground">
@@ -386,11 +395,11 @@ function JsonDiff() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Textarea
-              placeholder="Paste modified JSON here..."
-              className="min-h-[300px] font-mono text-sm"
+            <CodeEditor
               value={rightInput}
-              onChange={(e) => setRightInput(e.target.value)}
+              onChange={setRightInput}
+              placeholder="Paste modified JSON here..."
+              minHeight="300px"
             />
           </CardContent>
         </Card>
