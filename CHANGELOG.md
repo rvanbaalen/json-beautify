@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.0](https://github.com/rvanbaalen/json-beautify/compare/json-beautify-v1.4.0...json-beautify-v1.5.0) (2025-12-17)
+
+
+### Features
+
+* add version number to footer ([#11](https://github.com/rvanbaalen/json-beautify/issues/11)) ([25aef11](https://github.com/rvanbaalen/json-beautify/commit/25aef1159dbbf4f7c531e177c7f69d6e6b26f2b6))
+* unify beautify and compare modes into single workspace ([#14](https://github.com/rvanbaalen/json-beautify/issues/14)) ([796e0de](https://github.com/rvanbaalen/json-beautify/commit/796e0dea48844cd7ae49d3916c6bb1380809a36c))
+
 ## [1.4.0](https://github.com/rvanbaalen/json-beautify/compare/json-beautify-v1.3.0...json-beautify-v1.4.0) (2025-12-17)
 
 
