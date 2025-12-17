@@ -38,7 +38,7 @@ function App() {
             <p>
               All processing happens in your browser. No data is sent to any server.
             </p>
-            <p className="mt-2">made by Robin.</p>
+            <p className="mt-2">Made by <a href="https://robinvanbaalen.nl" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">Robin</a>.</p>
           </motion.footer>
         </div>
       </div>
