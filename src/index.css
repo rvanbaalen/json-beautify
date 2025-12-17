@@ -42,6 +42,15 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-diff-added: var(--diff-added);
+  --color-diff-added-foreground: var(--diff-added-foreground);
+  --color-diff-added-bg: var(--diff-added-bg);
+  --color-diff-removed: var(--diff-removed);
+  --color-diff-removed-foreground: var(--diff-removed-foreground);
+  --color-diff-removed-bg: var(--diff-removed-bg);
+  --color-diff-modified: var(--diff-modified);
+  --color-diff-modified-foreground: var(--diff-modified-foreground);
+  --color-diff-modified-bg: var(--diff-modified-bg);
 }
 
 :root {
@@ -77,6 +86,15 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --diff-added: oklch(0.723 0.191 142.5);
+  --diff-added-foreground: oklch(0.27 0.072 142.5);
+  --diff-added-bg: oklch(0.938 0.058 142.5);
+  --diff-removed: oklch(0.577 0.245 27.325);
+  --diff-removed-foreground: oklch(0.985 0 0);
+  --diff-removed-bg: oklch(0.936 0.032 17.717);
+  --diff-modified: oklch(0.795 0.184 86.047);
+  --diff-modified-foreground: oklch(0.344 0.069 86.047);
+  --diff-modified-bg: oklch(0.962 0.044 86.047);
 }
 
 .dark {
@@ -111,6 +129,15 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  --diff-added: oklch(0.627 0.194 149.214);
+  --diff-added-foreground: oklch(0.938 0.058 142.5);
+  --diff-added-bg: oklch(0.266 0.065 152.934);
+  --diff-removed: oklch(0.704 0.191 22.216);
+  --diff-removed-foreground: oklch(0.936 0.032 17.717);
+  --diff-removed-bg: oklch(0.302 0.056 29.234);
+  --diff-modified: oklch(0.795 0.184 86.047);
+  --diff-modified-foreground: oklch(0.962 0.044 86.047);
+  --diff-modified-bg: oklch(0.344 0.069 86.047);
 }
 
 @layer base {
@@ -120,4 +147,72 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* jsondiffpatch annotated view styles using shadcn CSS variables */
+.jsondiffpatch-annotated {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+.jsondiffpatch-delta {
+  font-family: inherit;
+}
+
+.jsondiffpatch-added .jsondiffpatch-property-name,
+.jsondiffpatch-added .jsondiffpatch-value pre,
+.jsondiffpatch-modified .jsondiffpatch-right-value pre,
+.jsondiffpatch-textdiff-added {
+  background-color: var(--diff-added-bg);
+  color: var(--diff-added-foreground);
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+.jsondiffpatch-deleted .jsondiffpatch-property-name,
+.jsondiffpatch-deleted .jsondiffpatch-value pre,
+.jsondiffpatch-modified .jsondiffpatch-left-value pre,
+.jsondiffpatch-textdiff-deleted {
+  background-color: var(--diff-removed-bg);
+  color: var(--diff-removed-foreground);
+  padding: 2px 4px;
+  border-radius: 2px;
+  text-decoration: line-through;
+}
+
+.jsondiffpatch-unchanged {
+  color: var(--muted-foreground);
+}
+
+.jsondiffpatch-value pre {
+  display: inline;
+  margin: 0;
+  padding: 0;
+}
+
+.jsondiffpatch-property-name {
+  font-weight: 500;
+}
+
+.jsondiffpatch-moved .jsondiffpatch-value {
+  background-color: var(--diff-modified-bg);
+  color: var(--diff-modified-foreground);
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+.jsondiffpatch-arrow {
+  color: var(--muted-foreground);
+  margin: 0 4px;
+}
+
+.jsondiffpatch-child-node-type-array > .jsondiffpatch-property-name::before {
+  content: "[";
+}
+
+.jsondiffpatch-child-node-type-array > .jsondiffpatch-property-name::after {
+  content: "]";
+}
+
+.jsondiffpatch-child-node-type-array > .jsondiffpatch-property-name {
+  color: var(--muted-foreground);
 }

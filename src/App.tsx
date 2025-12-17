@@ -11,6 +11,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import JsonDiff from '@/components/JsonDiff'
 
 interface FormatPreset {
   name: string
@@ -118,96 +120,109 @@ function App() {
         <header className="mb-8 text-center">
           <h1 className="text-3xl font-bold tracking-tight md:text-4xl">JSON Beautifier</h1>
           <p className="mt-2 text-muted-foreground">
-            Paste your JSON, select a preset, and beautify!
+            Format, beautify, and compare your JSON data
           </p>
         </header>
 
-        <div className="mb-6 flex flex-wrap items-center justify-center gap-4">
-          <div className="flex items-center gap-2">
-            <Label htmlFor="preset" className="whitespace-nowrap">
-              Format Preset:
-            </Label>
-            <Select value={selectedPreset} onValueChange={setSelectedPreset}>
-              <SelectTrigger id="preset" className="w-[200px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(presets).map(([key, preset]) => (
-                  <SelectItem key={key} value={key}>
-                    {preset.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        <Tabs defaultValue="beautify" className="space-y-6">
+          <TabsList className="mx-auto">
+            <TabsTrigger value="beautify">Beautify</TabsTrigger>
+            <TabsTrigger value="diff">Compare / Diff</TabsTrigger>
+          </TabsList>
 
-          <Separator orientation="vertical" className="hidden h-8 md:block" />
+          <TabsContent value="beautify" className="space-y-6">
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="preset" className="whitespace-nowrap">
+                  Format Preset:
+                </Label>
+                <Select value={selectedPreset} onValueChange={setSelectedPreset}>
+                  <SelectTrigger id="preset" className="w-[200px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(presets).map(([key, preset]) => (
+                      <SelectItem key={key} value={key}>
+                        {preset.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-          <div className="flex gap-2">
-            <Button onClick={beautifyJson} size="lg">
-              Beautify
-            </Button>
-            <Button onClick={loadSample} variant="outline">
-              Load Sample
-            </Button>
-            <Button onClick={clearAll} variant="outline">
-              Clear
-            </Button>
-          </div>
-        </div>
+              <Separator orientation="vertical" className="hidden h-8 md:block" />
 
-        {error && (
-          <div className="mb-4 rounded-lg border border-destructive bg-destructive/10 p-4 text-destructive">
-            {error}
-          </div>
-        )}
+              <div className="flex gap-2">
+                <Button onClick={beautifyJson} size="lg">
+                  Beautify
+                </Button>
+                <Button onClick={loadSample} variant="outline">
+                  Load Sample
+                </Button>
+                <Button onClick={clearAll} variant="outline">
+                  Clear
+                </Button>
+              </div>
+            </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>Input</span>
-                <span className="text-sm font-normal text-muted-foreground">
-                  {input.length} characters
-                </span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Textarea
-                placeholder="Paste your JSON here..."
-                className="min-h-[400px] font-mono text-sm"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-              />
-            </CardContent>
-          </Card>
+            {error && (
+              <div className="rounded-lg border border-destructive bg-destructive/10 p-4 text-destructive">
+                {error}
+              </div>
+            )}
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>Output</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-normal text-muted-foreground">
-                    {output.length} characters
-                  </span>
-                  {output && (
-                    <Button size="sm" variant="outline" onClick={copyToClipboard}>
-                      {copied ? 'Copied!' : 'Copy'}
-                    </Button>
-                  )}
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Textarea
-                placeholder="Beautified JSON will appear here..."
-                className="min-h-[400px] font-mono text-sm"
-                value={output}
-                readOnly
-              />
-            </CardContent>
-          </Card>
-        </div>
+            <div className="grid gap-6 md:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span>Input</span>
+                    <span className="text-sm font-normal text-muted-foreground">
+                      {input.length} characters
+                    </span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Textarea
+                    placeholder="Paste your JSON here..."
+                    className="min-h-[400px] font-mono text-sm"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                  />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span>Output</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-normal text-muted-foreground">
+                        {output.length} characters
+                      </span>
+                      {output && (
+                        <Button size="sm" variant="outline" onClick={copyToClipboard}>
+                          {copied ? 'Copied!' : 'Copy'}
+                        </Button>
+                      )}
+                    </div>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Textarea
+                    placeholder="Beautified JSON will appear here..."
+                    className="min-h-[400px] font-mono text-sm"
+                    value={output}
+                    readOnly
+                  />
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="diff">
+            <JsonDiff />
+          </TabsContent>
+        </Tabs>
 
         <footer className="mt-8 text-center text-sm text-muted-foreground">
           <p>
