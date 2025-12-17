@@ -246,6 +246,7 @@ function App() {
               >
                 Robin van Baalen
               </a>
+              {' '}&middot; v{__APP_VERSION__}
             </p>
           </footer>
         </div>
