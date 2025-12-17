@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.0](https://github.com/rvanbaalen/json-beautify/compare/json-beautify-v1.6.0...json-beautify-v1.7.0) (2025-12-17)
+
+
+### Features
+
+* add JSON/Markdown mode toggle ([#22](https://github.com/rvanbaalen/json-beautify/issues/22)) ([958f3bc](https://github.com/rvanbaalen/json-beautify/commit/958f3bc855f257413110c4fbbefdeaf298be83f0))
+
 ## [1.6.0](https://github.com/rvanbaalen/json-beautify/compare/json-beautify-v1.5.1...json-beautify-v1.6.0) (2025-12-17)
 
 
