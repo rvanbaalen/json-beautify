@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react'
+import { Github } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
@@ -115,7 +116,16 @@ function App() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
+    <div className="relative min-h-screen bg-background p-4 md:p-8">
+      <a
+        href="https://github.com/rvanbaalen/json-beautify"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="absolute right-4 top-4 text-muted-foreground transition-colors hover:text-foreground"
+        aria-label="View source on GitHub"
+      >
+        <Github className="h-6 w-6" />
+      </a>
       <div className="mx-auto max-w-7xl">
         <header className="mb-8 text-center">
           <h1 className="text-3xl font-bold tracking-tight md:text-4xl">JSON Beautifier</h1>
@@ -227,6 +237,17 @@ function App() {
         <footer className="mt-8 text-center text-sm text-muted-foreground">
           <p>
             All processing happens in your browser. No data is sent to any server.
+          </p>
+          <p className="mt-2">
+            Made by{' '}
+            <a
+              href="https://robinvanbaalen.nl"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline transition-colors hover:text-foreground"
+            >
+              Robin van Baalen
+            </a>
           </p>
         </footer>
       </div>
