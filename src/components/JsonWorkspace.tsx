@@ -13,7 +13,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
-import { CodeEditor } from '@/components/code-editor'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { CodeEditor, type EditorLanguage } from '@/components/code-editor'
 import {
   ArrowLeftRight,
   Sparkles,
@@ -22,8 +23,12 @@ import {
   Check,
   Trash2,
   FileJson,
+  FileText,
   X,
 } from 'lucide-react'
+
+// Content type
+type ContentType = 'json' | 'markdown'
 
 const MotionCard = motion.create(Card)
 
@@ -71,6 +76,117 @@ function sortObjectKeys(obj: unknown): unknown {
 function formatJson(value: unknown, indent: number | string = 2): string {
   const ind = indent === 0 ? undefined : indent
   return JSON.stringify(value, null, ind)
+}
+
+// Markdown beautify presets
+interface MarkdownPreset {
+  name: string
+  normalizeHeadings: boolean
+  normalizeListIndent: number
+  trimTrailingWhitespace: boolean
+  ensureNewlineAtEnd: boolean
+  normalizeBlankLines: boolean
+}
+
+const markdownPresets: Record<string, MarkdownPreset> = {
+  standard: {
+    name: 'Standard',
+    normalizeHeadings: true,
+    normalizeListIndent: 2,
+    trimTrailingWhitespace: true,
+    ensureNewlineAtEnd: true,
+    normalizeBlankLines: true,
+  },
+  compact: {
+    name: 'Compact',
+    normalizeHeadings: true,
+    normalizeListIndent: 2,
+    trimTrailingWhitespace: true,
+    ensureNewlineAtEnd: true,
+    normalizeBlankLines: false,
+  },
+  expanded: {
+    name: 'Expanded (4-space lists)',
+    normalizeHeadings: true,
+    normalizeListIndent: 4,
+    trimTrailingWhitespace: true,
+    ensureNewlineAtEnd: true,
+    normalizeBlankLines: true,
+  },
+}
+
+function formatMarkdown(content: string, preset: MarkdownPreset): string {
+  let lines = content.split('\n')
+
+  // Trim trailing whitespace from each line
+  if (preset.trimTrailingWhitespace) {
+    lines = lines.map(line => line.trimEnd())
+  }
+
+  // Normalize heading spacing (ensure space after #)
+  if (preset.normalizeHeadings) {
+    lines = lines.map(line => {
+      const headingMatch = line.match(/^(#{1,6})([^\s#].*)$/)
+      if (headingMatch) {
+        return `${headingMatch[1]} ${headingMatch[2].trim()}`
+      }
+      return line
+    })
+  }
+
+  // Normalize list indentation
+  const indentSize = preset.normalizeListIndent
+  lines = lines.map(line => {
+    // Match unordered list items (-, *, +) with any amount of leading whitespace
+    const unorderedMatch = line.match(/^(\s*)([-*+])(\s+)(.*)$/)
+    if (unorderedMatch) {
+      const [, leadingSpace, marker, , text] = unorderedMatch
+      // Calculate the nesting level based on original indentation
+      const originalIndent = leadingSpace.length
+      const level = Math.floor(originalIndent / 2) // Assume original was ~2 spaces per level
+      const newIndent = ' '.repeat(level * indentSize)
+      return `${newIndent}${marker} ${text}`
+    }
+
+    // Match ordered list items (1., 2., etc.)
+    const orderedMatch = line.match(/^(\s*)(\d+\.)(\s+)(.*)$/)
+    if (orderedMatch) {
+      const [, leadingSpace, marker, , text] = orderedMatch
+      const originalIndent = leadingSpace.length
+      const level = Math.floor(originalIndent / 2)
+      const newIndent = ' '.repeat(level * indentSize)
+      return `${newIndent}${marker} ${text}`
+    }
+
+    return line
+  })
+
+  // Normalize blank lines (max 2 consecutive)
+  if (preset.normalizeBlankLines) {
+    const result: string[] = []
+    let consecutiveBlankLines = 0
+    for (const line of lines) {
+      if (line.trim() === '') {
+        consecutiveBlankLines++
+        if (consecutiveBlankLines <= 1) {
+          result.push(line)
+        }
+      } else {
+        consecutiveBlankLines = 0
+        result.push(line)
+      }
+    }
+    lines = result
+  }
+
+  let formatted = lines.join('\n')
+
+  // Ensure newline at end
+  if (preset.ensureNewlineAtEnd && !formatted.endsWith('\n')) {
+    formatted += '\n'
+  }
+
+  return formatted
 }
 
 function computeLineDiff(leftLines: string[], rightLines: string[]): DiffLine[] {
@@ -123,12 +239,16 @@ function computeLineDiff(leftLines: string[], rightLines: string[]): DiffLine[] 
 type WorkspaceMode = 'idle' | 'beautify' | 'compare'
 
 export function JsonWorkspace() {
+  // Content type
+  const [contentType, setContentType] = useState<ContentType>('json')
+
   // Inputs
   const [primaryInput, setPrimaryInput] = useState('')
   const [secondaryInput, setSecondaryInput] = useState('')
 
   // Beautify state
   const [selectedPreset, setSelectedPreset] = useState('standard')
+  const [selectedMarkdownPreset, setSelectedMarkdownPreset] = useState('standard')
   const [beautifiedOutput, setBeautifiedOutput] = useState('')
 
   // Diff state
@@ -159,6 +279,14 @@ export function JsonWorkspace() {
       return { output: '', error: '' }
     }
 
+    if (contentType === 'markdown') {
+      // Markdown beautification - no parsing needed, just format
+      const preset = markdownPresets[selectedMarkdownPreset]
+      const formatted = formatMarkdown(primaryInput, preset)
+      return { output: formatted, error: '' }
+    }
+
+    // JSON beautification
     try {
       let parsed = JSON.parse(primaryInput)
       const preset = presets[selectedPreset]
@@ -175,7 +303,7 @@ export function JsonWorkspace() {
         error: `Invalid JSON: ${e instanceof Error ? e.message : 'Unknown error'}`
       }
     }
-  }, [primaryInput, selectedPreset, currentMode])
+  }, [primaryInput, selectedPreset, selectedMarkdownPreset, currentMode, contentType])
 
   // Use derived beautified output or state-based output (for copy functionality)
   const displayedBeautifiedOutput = beautifiedResult.output || beautifiedOutput
@@ -190,10 +318,23 @@ export function JsonWorkspace() {
     setBeautifiedOutput('')
 
     if (!primaryInput.trim() || !secondaryInput.trim()) {
-      setError('Please enter JSON in both panels to compare')
+      setError(`Please enter ${contentType === 'markdown' ? 'markdown' : 'JSON'} in both panels to compare`)
       return
     }
 
+    if (contentType === 'markdown') {
+      // Markdown comparison - simple line-by-line diff
+      const leftLines = primaryInput.split('\n')
+      const rightLines = secondaryInput.split('\n')
+      const diff = computeLineDiff(leftLines, rightLines)
+      setDiffResult(diff)
+      // Store raw content for split view
+      setLeftParsed(primaryInput)
+      setRightParsed(secondaryInput)
+      return
+    }
+
+    // JSON comparison
     try {
       const left = JSON.parse(primaryInput)
       const right = JSON.parse(secondaryInput)
@@ -212,7 +353,7 @@ export function JsonWorkspace() {
     } catch (e) {
       setError(`Invalid JSON: ${e instanceof Error ? e.message : 'Unknown error'}`)
     }
-  }, [primaryInput, secondaryInput])
+  }, [primaryInput, secondaryInput, contentType])
 
   const swapInputs = useCallback(() => {
     setPrimaryInput(secondaryInput)
@@ -251,39 +392,113 @@ export function JsonWorkspace() {
   }, [])
 
   const loadSample = useCallback(() => {
-    if (currentMode === 'compare' || showSecondary) {
-      const sampleLeft = {
-        name: 'JSON Beautifier',
-        version: '1.0.0',
-        features: ['Format JSON', 'Multiple presets'],
-        config: { theme: 'light', autoFormat: false },
+    if (contentType === 'markdown') {
+      // Markdown samples
+      if (currentMode === 'compare' || showSecondary) {
+        const sampleLeftMd = `# Project Documentation
+
+## Overview
+This is the original documentation.
+
+## Features
+- Feature one
+- Feature two
+  - Sub-feature A
+  - Sub-feature B
+
+## Installation
+Run the following command:
+\`\`\`bash
+npm install
+\`\`\`
+
+## License
+MIT`
+        const sampleRightMd = `# Project Documentation
+
+## Overview
+This is the updated documentation with changes.
+
+## Features
+- Feature one (improved)
+- Feature two
+  - Sub-feature A
+  - Sub-feature B
+  - Sub-feature C (new!)
+- Feature three (new)
+
+## Installation
+Run the following command:
+\`\`\`bash
+npm install my-package
+\`\`\`
+
+## Configuration
+Add a config file to customize behavior.
+
+## License
+MIT`
+        setPrimaryInput(sampleLeftMd)
+        setSecondaryInput(sampleRightMd)
+      } else {
+        const sampleMd = `#My Poorly Formatted Markdown
+
+##Introduction
+This markdown has   some    formatting issues.
+
+##Features
+-  Feature one
+-Feature two
+   -   Sub-item with weird indentation
+   -Sub-item without space
+      - Deeply nested item
+
+##Code Example
+\`\`\`javascript
+const x = 1;
+\`\`\`
+
+
+##Conclusion
+This needs beautification!   `
+        setPrimaryInput(sampleMd)
       }
-      const sampleRight = {
-        name: 'JSON Beautifier Pro',
-        version: '2.0.0',
-        features: ['Format JSON', 'Multiple presets', 'Diff tool'],
-        config: { theme: 'dark', autoFormat: true, newSetting: 'enabled' },
-      }
-      setPrimaryInput(JSON.stringify(sampleLeft))
-      setSecondaryInput(JSON.stringify(sampleRight))
     } else {
-      const sample = {
-        name: 'JSON Beautifier',
-        version: '1.0.0',
-        features: ['Format JSON', 'Multiple presets', 'Sort keys', 'Copy to clipboard'],
-        config: {
-          theme: 'light',
-          autoFormat: false,
-          settings: { indentation: 2, sortKeys: false },
-        },
-        data: [1, 2, 3, { nested: true }],
+      // JSON samples
+      if (currentMode === 'compare' || showSecondary) {
+        const sampleLeft = {
+          name: 'JSON Beautifier',
+          version: '1.0.0',
+          features: ['Format JSON', 'Multiple presets'],
+          config: { theme: 'light', autoFormat: false },
+        }
+        const sampleRight = {
+          name: 'JSON Beautifier Pro',
+          version: '2.0.0',
+          features: ['Format JSON', 'Multiple presets', 'Diff tool'],
+          config: { theme: 'dark', autoFormat: true, newSetting: 'enabled' },
+        }
+        setPrimaryInput(JSON.stringify(sampleLeft))
+        setSecondaryInput(JSON.stringify(sampleRight))
+      } else {
+        const sample = {
+          name: 'JSON Beautifier',
+          version: '1.0.0',
+          features: ['Format JSON', 'Multiple presets', 'Sort keys', 'Copy to clipboard'],
+          config: {
+            theme: 'light',
+            autoFormat: false,
+            settings: { indentation: 2, sortKeys: false },
+          },
+          data: [1, 2, 3, { nested: true }],
+        }
+        setPrimaryInput(JSON.stringify(sample))
       }
-      setPrimaryInput(JSON.stringify(sample))
     }
     setError('')
     setDiffResult(null)
     setSemanticDiff(undefined)
-  }, [currentMode, showSecondary])
+  }, [currentMode, showSecondary, contentType])
 
   const enableCompareMode = useCallback(() => {
     setShowSecondary(true)
@@ -364,8 +579,13 @@ export function JsonWorkspace() {
   const renderSplitView = () => {
     if (!leftParsed || !rightParsed) return null
 
-    const leftLines = formatJson(leftParsed).split('\n')
-    const rightLines = formatJson(rightParsed).split('\n')
+    // For markdown, leftParsed/rightParsed are strings; for JSON they are objects
+    const leftLines = contentType === 'markdown'
+      ? (leftParsed as string).split('\n')
+      : formatJson(leftParsed).split('\n')
+    const rightLines = contentType === 'markdown'
+      ? (rightParsed as string).split('\n')
+      : formatJson(rightParsed).split('\n')
 
     return (
       <div className="grid gap-4 md:grid-cols-2">
@@ -427,8 +647,42 @@ export function JsonWorkspace() {
 
   const isCompareMode = currentMode === 'compare' || showSecondary
 
+  // Handler for content type change - clears inputs when switching
+  const handleContentTypeChange = useCallback((value: string) => {
+    setContentType(value as ContentType)
+    // Clear inputs when switching content types
+    setPrimaryInput('')
+    setSecondaryInput('')
+    setError('')
+    setBeautifiedOutput('')
+    setDiffResult(null)
+    setSemanticDiff(undefined)
+    setShowSecondary(false)
+  }, [])
+
   return (
     <div className="space-y-6">
+      {/* Content type toggle */}
+      <motion.div
+        className="flex justify-center"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <Tabs value={contentType} onValueChange={handleContentTypeChange}>
+          <TabsList>
+            <TabsTrigger value="json" className="gap-1.5">
+              <FileJson className="w-4 h-4" />
+              JSON
+            </TabsTrigger>
+            <TabsTrigger value="markdown" className="gap-1.5">
+              <FileText className="w-4 h-4" />
+              Markdown
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </motion.div>
+
       {/* Mode indicator and controls */}
       <motion.div
         className="flex flex-wrap items-center justify-center gap-4"
@@ -439,7 +693,7 @@ export function JsonWorkspace() {
         {/* Mode badge */}
         <AnimatePresence mode="wait">
           <motion.div
-            key={currentMode}
+            key={`${currentMode}-${contentType}`}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
@@ -463,7 +717,7 @@ export function JsonWorkspace() {
               </>
             ) : (
               <>
-                <FileJson className="w-4 h-4" />
+                {contentType === 'markdown' ? <FileText className="w-4 h-4" /> : <FileJson className="w-4 h-4" />}
                 Ready
               </>
             )}
@@ -484,18 +738,33 @@ export function JsonWorkspace() {
               <Label htmlFor="preset" className="whitespace-nowrap font-medium">
                 Format:
               </Label>
-              <Select value={selectedPreset} onValueChange={setSelectedPreset}>
-                <SelectTrigger id="preset" className="w-[180px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(presets).map(([key, preset]) => (
-                    <SelectItem key={key} value={key}>
-                      {preset.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {contentType === 'json' ? (
+                <Select value={selectedPreset} onValueChange={setSelectedPreset}>
+                  <SelectTrigger id="preset" className="w-[180px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(presets).map(([key, preset]) => (
+                      <SelectItem key={key} value={key}>
+                        {preset.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Select value={selectedMarkdownPreset} onValueChange={setSelectedMarkdownPreset}>
+                  <SelectTrigger id="preset" className="w-[180px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(markdownPresets).map(([key, preset]) => (
+                      <SelectItem key={key} value={key}>
+                        {preset.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
@@ -519,7 +788,10 @@ export function JsonWorkspace() {
                 <SelectContent>
                   <SelectItem value="unified">Unified</SelectItem>
                   <SelectItem value="split">Side by Side</SelectItem>
-                  <SelectItem value="annotated">Annotated</SelectItem>
+                  {/* Annotated view only available for JSON (semantic diff) */}
+                  {contentType === 'json' && (
+                    <SelectItem value="annotated">Annotated</SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </motion.div>
@@ -557,7 +829,7 @@ export function JsonWorkspace() {
             </Button>
           )}
           <Button onClick={loadSample} variant="outline">
-            <FileJson className="w-4 h-4" />
+            {contentType === 'markdown' ? <FileText className="w-4 h-4" /> : <FileJson className="w-4 h-4" />}
             Sample
           </Button>
           <Button onClick={clearAll} variant="outline" size="icon" title="Clear all">
@@ -607,8 +879,9 @@ export function JsonWorkspace() {
             <CodeEditor
               value={primaryInput}
               onChange={setPrimaryInput}
-              placeholder="Paste your JSON here..."
+              placeholder={contentType === 'markdown' ? 'Paste your markdown here...' : 'Paste your JSON here...'}
               minHeight={isCompareMode ? '300px' : 'calc(100vh - 480px)'}
+              language={contentType as EditorLanguage}
             />
           </CardContent>
         </MotionCard>
@@ -646,8 +919,9 @@ export function JsonWorkspace() {
                 <CodeEditor
                   value={secondaryInput}
                   onChange={setSecondaryInput}
-                  placeholder="Paste JSON to compare..."
+                  placeholder={contentType === 'markdown' ? 'Paste markdown to compare...' : 'Paste JSON to compare...'}
                   minHeight="300px"
+                  language={contentType as EditorLanguage}
                 />
               </CardContent>
             </MotionCard>
@@ -684,8 +958,9 @@ export function JsonWorkspace() {
                 <CodeEditor
                   value={displayedBeautifiedOutput}
                   readOnly
-                  placeholder="Beautified JSON will appear here..."
+                  placeholder={contentType === 'markdown' ? 'Beautified markdown will appear here...' : 'Beautified JSON will appear here...'}
                   minHeight="calc(100vh - 480px)"
+                  language={contentType as EditorLanguage}
                 />
               </CardContent>
             </MotionCard>
