@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.2.0](https://github.com/rvanbaalen/json-beautify/compare/json-beautify-v1.1.0...json-beautify-v1.2.0) (2025-12-17)
+
+
+### Features
+
+* add GitHub repo link and footer attribution ([#6](https://github.com/rvanbaalen/json-beautify/issues/6)) ([57d468b](https://github.com/rvanbaalen/json-beautify/commit/57d468bd47aba7a1ba07b6de71db01091302dfe1))
+* Add JSON diff tool with color-coded output ([#5](https://github.com/rvanbaalen/json-beautify/issues/5)) ([d06592a](https://github.com/rvanbaalen/json-beautify/commit/d06592a32d1c51acc14c150e6f6ff81516f1b23f))
+
+
+### Bug Fixes
+
+* deploy to GitHub Pages only after release-please release ([#3](https://github.com/rvanbaalen/json-beautify/issues/3)) ([1be394e](https://github.com/rvanbaalen/json-beautify/commit/1be394e089332be6e9e6fee5c4ccc7a939ca7094))
+
 ## [1.1.0](https://github.com/rvanbaalen/json-beautify/compare/json-beautify-v1.0.0...json-beautify-v1.1.0) (2025-12-17)
 
 
