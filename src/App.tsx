@@ -182,7 +182,7 @@ function App() {
                 <Separator orientation="vertical" className="hidden h-8 md:block" />
 
                 <div className="flex gap-2">
-                  <Button onClick={beautifyJson} size="lg">
+                  <Button onClick={beautifyJson}>
                     Beautify
                   </Button>
                   <Button onClick={loadSample} variant="outline">
