@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from 'react'
+import { motion, AnimatePresence } from 'motion/react'
 import { create, type Delta } from 'jsondiffpatch'
 import { format as formatHtml } from 'jsondiffpatch/formatters/html'
 import { Button } from '@/components/ui/button'
@@ -13,6 +14,8 @@ import {
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { CodeEditor } from '@/components/code-editor'
+
+const MotionCard = motion.create(Card)
 
 type DiffViewMode = 'unified' | 'split' | 'annotated'
 
@@ -324,9 +327,14 @@ function JsonDiff() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-center gap-4">
+      <motion.div
+        className="flex flex-wrap items-center justify-center gap-4"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      >
         <div className="flex items-center gap-2">
-          <Label htmlFor="viewMode" className="whitespace-nowrap">
+          <Label htmlFor="viewMode" className="whitespace-nowrap font-medium">
             View Mode:
           </Label>
           <Select value={viewMode} onValueChange={(v) => setViewMode(v as DiffViewMode)}>
@@ -357,21 +365,36 @@ function JsonDiff() {
             Clear
           </Button>
         </div>
-      </div>
+      </motion.div>
 
-      {error && (
-        <div className="rounded-lg border border-destructive bg-destructive/10 p-4 text-destructive">
-          {error}
-        </div>
-      )}
+      <AnimatePresence mode="wait">
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: -10, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: 'auto' }}
+            exit={{ opacity: 0, y: -10, height: 0 }}
+            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden"
+          >
+            <div className="rounded-lg border border-destructive bg-destructive/10 p-4 text-destructive">
+              {error}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Card>
+        <MotionCard
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+          whileHover={{ y: -2 }}
+        >
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center justify-between">
-              <span>Original JSON</span>
-              <span className="text-sm font-normal text-muted-foreground">
-                {leftInput.length} characters
+              <span className="font-serif text-lg italic">Original JSON</span>
+              <span className="font-mono text-xs font-normal text-muted-foreground">
+                {leftInput.length} chars
               </span>
             </CardTitle>
           </CardHeader>
@@ -383,14 +406,19 @@ function JsonDiff() {
               minHeight="300px"
             />
           </CardContent>
-        </Card>
+        </MotionCard>
 
-        <Card>
+        <MotionCard
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+          whileHover={{ y: -2 }}
+        >
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center justify-between">
-              <span>Modified JSON</span>
-              <span className="text-sm font-normal text-muted-foreground">
-                {rightInput.length} characters
+              <span className="font-serif text-lg italic">Modified JSON</span>
+              <span className="font-mono text-xs font-normal text-muted-foreground">
+                {rightInput.length} chars
               </span>
             </CardTitle>
           </CardHeader>
@@ -402,49 +430,77 @@ function JsonDiff() {
               minHeight="300px"
             />
           </CardContent>
-        </Card>
+        </MotionCard>
       </div>
 
-      {diffResult && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>Diff Result</span>
-              <div className="flex items-center gap-4 text-sm font-normal">
-                {!hasChanges ? (
-                  <span className="text-muted-foreground">No changes detected</span>
-                ) : (
-                  <>
-                    <span className="text-diff-added">+{stats.added} added</span>
-                    <span className="text-diff-removed">-{stats.removed} removed</span>
-                    {stats.modified > 0 && (
-                      <span className="text-diff-modified">~{stats.modified} modified</span>
-                    )}
-                  </>
-                )}
-              </div>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {viewMode === 'unified' ? (
-              <div className="rounded-md border bg-muted/30 overflow-auto max-h-[500px]">
-                {diffResult.map((line, idx) => renderDiffLine(line, idx))}
-              </div>
-            ) : viewMode === 'split' ? (
-              renderSplitView()
-            ) : renderAnnotatedHtml ? (
-              <div
-                className="jsondiffpatch-annotated rounded-md border bg-muted/30 overflow-auto max-h-[500px] p-4 font-mono text-sm"
-                dangerouslySetInnerHTML={{ __html: renderAnnotatedHtml }}
-              />
-            ) : (
-              <div className="rounded-md border bg-muted/30 overflow-auto max-h-[500px]">
-                {diffResult.map((line, idx) => renderDiffLine(line, idx))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
+      <AnimatePresence mode="wait">
+        {diffResult && (
+          <MotionCard
+            initial={{ opacity: 0, y: 20, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.98 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span className="font-serif text-lg italic">Diff Result</span>
+                <div className="flex items-center gap-4 font-mono text-xs font-normal">
+                  {!hasChanges ? (
+                    <span className="text-muted-foreground">No changes detected</span>
+                  ) : (
+                    <>
+                      <motion.span
+                        className="text-diff-added"
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1 }}
+                      >
+                        +{stats.added} added
+                      </motion.span>
+                      <motion.span
+                        className="text-diff-removed"
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.15 }}
+                      >
+                        -{stats.removed} removed
+                      </motion.span>
+                      {stats.modified > 0 && (
+                        <motion.span
+                          className="text-diff-modified"
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.2 }}
+                        >
+                          ~{stats.modified} modified
+                        </motion.span>
+                      )}
+                    </>
+                  )}
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {viewMode === 'unified' ? (
+                <div className="rounded-md border bg-muted/30 overflow-auto max-h-[500px]">
+                  {diffResult.map((line, idx) => renderDiffLine(line, idx))}
+                </div>
+              ) : viewMode === 'split' ? (
+                renderSplitView()
+              ) : renderAnnotatedHtml ? (
+                <div
+                  className="jsondiffpatch-annotated rounded-md border bg-muted/30 overflow-auto max-h-[500px] p-4 font-mono text-sm"
+                  dangerouslySetInnerHTML={{ __html: renderAnnotatedHtml }}
+                />
+              ) : (
+                <div className="rounded-md border bg-muted/30 overflow-auto max-h-[500px]">
+                  {diffResult.map((line, idx) => renderDiffLine(line, idx))}
+                </div>
+              )}
+            </CardContent>
+          </MotionCard>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
