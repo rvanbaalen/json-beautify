@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/rvanbaalen/json-beautify/compare/json-beautify-v1.5.1...json-beautify-v1.6.0) (2025-12-17)
+
+
+### Features
+
+* replace custom GitHub button with official GitHub Buttons widget ([#18](https://github.com/rvanbaalen/json-beautify/issues/18)) ([92f408c](https://github.com/rvanbaalen/json-beautify/commit/92f408c1217361c5628580495a699a9a623184ce))
+
 ## [1.5.1](https://github.com/rvanbaalen/json-beautify/compare/json-beautify-v1.5.0...json-beautify-v1.5.1) (2025-12-17)
 
 
