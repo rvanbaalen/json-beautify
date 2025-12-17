@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/rvanbaalen/json-beautify/compare/json-beautify-v1.3.0...json-beautify-v1.4.0) (2025-12-17)
+
+
+### Features
+
+* refine UI with Motion animations and distinctive typography ([#9](https://github.com/rvanbaalen/json-beautify/issues/9)) ([82c326b](https://github.com/rvanbaalen/json-beautify/commit/82c326bb0d6805f3a08a74c6747af81d1165d877))
+
 ## [1.3.0](https://github.com/rvanbaalen/json-beautify/compare/json-beautify-v1.2.0...json-beautify-v1.3.0) (2025-12-17)
 
 
