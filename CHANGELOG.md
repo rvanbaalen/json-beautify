@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.0](https://github.com/rvanbaalen/json-beautify/compare/json-beautify-v1.7.0...json-beautify-v1.8.0) (2026-01-15)
+
+
+### Features
+
+* improve markdown mode UI and add rendered preview ([#24](https://github.com/rvanbaalen/json-beautify/issues/24)) ([f871238](https://github.com/rvanbaalen/json-beautify/commit/f8712383651a20ebe27c4a7b15754b25c14c8f96))
+
 ## [1.7.0](https://github.com/rvanbaalen/json-beautify/compare/json-beautify-v1.6.0...json-beautify-v1.7.0) (2025-12-17)
 
 
