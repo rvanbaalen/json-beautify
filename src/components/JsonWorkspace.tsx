@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { create, type Delta } from 'jsondiffpatch'
 import { format as formatHtml } from 'jsondiffpatch/formatters/html'
+import ReactMarkdown from 'react-markdown'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
@@ -25,10 +26,15 @@ import {
   FileJson,
   FileText,
   X,
+  Eye,
+  Code,
 } from 'lucide-react'
 
 // Content type
 type ContentType = 'json' | 'markdown'
+
+// Markdown output view mode
+type MarkdownOutputView = 'code' | 'rendered'
 
 const MotionCard = motion.create(Card)
 
@@ -262,6 +268,7 @@ export function JsonWorkspace() {
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
   const [showSecondary, setShowSecondary] = useState(false)
+  const [markdownOutputView, setMarkdownOutputView] = useState<MarkdownOutputView>('code')
 
   // Determine current mode based on content
   const currentMode: WorkspaceMode = useMemo(() => {
@@ -517,7 +524,9 @@ This needs beautification!   `
     return { added, removed, modified }
   }, [diffResult])
 
-  const hasChanges = semanticDiff !== undefined
+  const hasChanges = contentType === 'markdown'
+    ? (diffResult !== null && diffResult.some(line => line.type !== 'unchanged'))
+    : semanticDiff !== undefined
 
   const renderAnnotatedHtml = useMemo(() => {
     if (!leftParsed || !semanticDiff) return null
@@ -942,6 +951,20 @@ This needs beautification!   `
                     <span className="font-mono text-xs font-normal text-muted-foreground">
                       {displayedBeautifiedOutput.length} chars
                     </span>
+                    {contentType === 'markdown' && (
+                      <Tabs value={markdownOutputView} onValueChange={(v) => setMarkdownOutputView(v as MarkdownOutputView)}>
+                        <TabsList className="h-8">
+                          <TabsTrigger value="code" className="gap-1 px-2 py-1 text-xs h-6">
+                            <Code className="w-3 h-3" />
+                            Code
+                          </TabsTrigger>
+                          <TabsTrigger value="rendered" className="gap-1 px-2 py-1 text-xs h-6">
+                            <Eye className="w-3 h-3" />
+                            Preview
+                          </TabsTrigger>
+                        </TabsList>
+                      </Tabs>
+                    )}
                     <Button
                       variant="outline"
                       size="sm"
@@ -955,13 +978,26 @@ This needs beautification!   `
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex-1">
-                <CodeEditor
-                  value={displayedBeautifiedOutput}
-                  readOnly
-                  placeholder={contentType === 'markdown' ? 'Beautified markdown will appear here...' : 'Beautified JSON will appear here...'}
-                  minHeight="calc(100vh - 480px)"
-                  language={contentType as EditorLanguage}
-                />
+                {contentType === 'markdown' && markdownOutputView === 'rendered' ? (
+                  <div
+                    className="markdown-preview rounded-md border bg-muted/30 overflow-auto p-6"
+                    style={{ minHeight: 'calc(100vh - 480px)' }}
+                  >
+                    {displayedBeautifiedOutput ? (
+                      <ReactMarkdown>{displayedBeautifiedOutput}</ReactMarkdown>
+                    ) : (
+                      <span className="text-muted-foreground">Rendered markdown will appear here...</span>
+                    )}
+                  </div>
+                ) : (
+                  <CodeEditor
+                    value={displayedBeautifiedOutput}
+                    readOnly
+                    placeholder={contentType === 'markdown' ? 'Beautified markdown will appear here...' : 'Beautified JSON will appear here...'}
+                    minHeight="calc(100vh - 480px)"
+                    language={contentType as EditorLanguage}
+                  />
+                )}
               </CardContent>
             </MotionCard>
           )}
