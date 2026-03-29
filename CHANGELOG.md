@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.1](https://github.com/rvanbaalen/json-beautify/compare/json-beautify-v1.8.0...json-beautify-v1.8.1) (2026-03-29)
+
+
+### Bug Fixes
+
+* update base path for custom domain ([40e3972](https://github.com/rvanbaalen/json-beautify/commit/40e39722e11469d6d47b52894fe9cfcf09a2d697))
+
 ## [1.8.0](https://github.com/rvanbaalen/json-beautify/compare/json-beautify-v1.7.0...json-beautify-v1.8.0) (2026-01-15)
 
 
