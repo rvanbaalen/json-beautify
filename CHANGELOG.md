@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.8.2](https://github.com/rvanbaalen/json-beautify/compare/json-beautify-v1.8.1...json-beautify-v1.8.2) (2026-09-22)
+
+
+### Bug Fixes
+
+* link back to robinvanbaalen.nl from the page footer ([ed7f8f3](https://github.com/rvanbaalen/json-beautify/commit/ed7f8f34e178c7f8464f9d4bb905adf9e11f1316))
+* **seo:** add a static heading and intro, lengthen the title and description ([d07d804](https://github.com/rvanbaalen/json-beautify/commit/d07d804cc34383075804b9c618716c02e401fb25))
+* **seo:** add Open Graph, Twitter card and canonical tags ([e2c716c](https://github.com/rvanbaalen/json-beautify/commit/e2c716ca8fabc2c9b6ba19f5db5518f927abf7c7))
+
 ## [1.8.1](https://github.com/rvanbaalen/json-beautify/compare/json-beautify-v1.8.0...json-beautify-v1.8.1) (2026-03-29)
 
 
