@@ -4,25 +4,30 @@
     <meta charset="UTF-8" />
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="A simple JSON beautifier tool that formats and beautifies JSON data with configurable presets" />
+    <meta name="description" content="A free online JSON beautifier that formats, validates and compares JSON with configurable indentation presets. Runs in your browser, nothing is uploaded." />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=JetBrains+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-    <title>JSON Beautifier</title>
+    <title>JSON Beautifier: Format, Validate and Compare JSON in Your Browser</title>
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://json-beautify.robinvanbaalen.nl/" />
-    <meta property="og:title" content="JSON Beautifier" />
-    <meta property="og:description" content="A simple JSON beautifier tool that formats, beautifies, and compares JSON data with configurable presets." />
+    <meta property="og:title" content="JSON Beautifier: Format, Validate and Compare JSON in Your Browser" />
+    <meta property="og:description" content="A free online JSON beautifier that formats, validates and compares JSON with configurable indentation presets. Runs in your browser, nothing is uploaded." />
     <meta property="og:image" content="https://robinvanbaalen.nl/og/default.png" />
     <meta property="og:site_name" content="Robin van Baalen" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="JSON Beautifier" />
-    <meta name="twitter:description" content="A simple JSON beautifier tool that formats, beautifies, and compares JSON data with configurable presets." />
+    <meta name="twitter:title" content="JSON Beautifier: Format, Validate and Compare JSON in Your Browser" />
+    <meta name="twitter:description" content="A free online JSON beautifier that formats, validates and compares JSON with configurable indentation presets. Runs in your browser, nothing is uploaded." />
     <meta name="twitter:image" content="https://robinvanbaalen.nl/og/default.png" />
     <link rel="canonical" href="https://json-beautify.robinvanbaalen.nl/" />
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <main class="mx-auto max-w-2xl px-6 py-16">
+        <h1 class="text-2xl font-semibold">JSON Beautifier</h1>
+        <p class="mt-4">Paste or type JSON and format it with one click. Choose a preset such as two-space, four-space, tab-indented, compact minified output, or sorted keys, then copy the result to your clipboard. Invalid JSON is reported with the parser error so you can find the problem quickly, and you can compare two documents to see how they differ. Everything is processed locally in your browser, so no data ever leaves your machine.</p>
+      </main>
+    </div>
     <footer class="py-4 text-center text-xs text-neutral-500"><a href="https://robinvanbaalen.nl/" class="hover:underline">Built by Robin van Baalen</a></footer>
     <script type="module" src="/src/main.tsx"></script>
   </body>
